@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Card Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Memory Card Game</h1>
+  <div class="game-board"></div>
+  <p id="status"></p>
+
+  <script>
+    const cardsArray = [
+      "🍎", "🍌", "🍇", "🍊",
+      "🍉", "🍒", "🥝", "🍍"
+    ];
+
+    // duplicate cards to make pairs
+    let gameCards = [...cardsArray, ...cardsArray];
+
+    // shuffle cards
+    gameCards.sort(() => 0.5 - Math.random());
+
+    const board = document.querySelector(".game-board");
+    let firstCard, secondCard;
+    let lockBoard = false;
+    let matches = 0;
+
+    // create cards
+    gameCards.forEach((emoji, index) => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.dataset.value = emoji;
+      card.dataset.index = index;
+      card.innerHTML = `<span class="front">${emoji}</span><span class="back">❓</span>`;
+      board.appendChild(card);
+
+      card.addEventListener("click", () => {
+        if (lockBoard || card.classList.contains("flip")) return;
+
+        card.classList.add("flip");
+
+        if (!firstCard) {
+          firstCard = card;
+        } else {
+          secondCard = card;
+          lockBoard = true;
+
+          if (firstCard.dataset.value === secondCard.dataset.value) {
+            firstCard = secondCard = null;
+            lockBoard = false;
+            matches++;
+            if (matches === cardsArray.length) {
+              document.getElementById("status").textContent = "🎉 You Win!";
+            }
+          } else {
+            setTimeout(() => {
+              firstCard.classList.remove("flip");
+              secondCard.classList.remove("flip");
+              firstCard = secondCard = null;
+              lockBoard = false;
+            }, 800);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
